@@ -1,0 +1,12 @@
+# --- Python bytecode ---
+__pycache__/
+*.py[cod]
+
+# --- Virtual environment ---
+.venv/
+
+# --- Unit test / pytest cache ---
+.pytest_cache/
+
+# --- Build / packaging artifacts ---
+*.egg-info/

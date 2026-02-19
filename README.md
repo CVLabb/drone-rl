@@ -16,7 +16,7 @@ drone-rl/
 └─ backend/                  # Python backend (physics simulation)
    ├─ core/                  # Core simulation and business logic
    ├─ tests/                 # Unit tests
-   │  └─ core/               # Mirrors core modules
+   │  └─ core_tests/               # Mirrors core modules
    ├─ main.py                # Program entry point and simulation runner
    └─ pyproject.toml         # Backend dependencies and configuration
 ```
@@ -75,4 +75,7 @@ ruff check .
 
 # Optional: automatically fix some issues
 ruff check . --fix
+
+# Run mypy to perform type checking on Python files
+mypy .
 ```

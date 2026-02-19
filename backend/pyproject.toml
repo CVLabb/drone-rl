@@ -10,9 +10,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "ruff"
+    "ruff",
+    "mypy"
 ]
 
 [tool.ruff]
 line-length = 100
 select = ["E", "F", "I", "B"]
+
+[tool.mypy]
+python_version = 3.11
+check_untyped_defs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = "build|dist|\\.venv|\\.eggs"

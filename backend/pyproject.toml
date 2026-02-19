@@ -7,3 +7,12 @@ dependencies = [
     "numpy",
     "numpy-quaternion",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "ruff"
+]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "B"]

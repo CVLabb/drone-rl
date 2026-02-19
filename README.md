@@ -57,7 +57,22 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+3a. **Install development dependencies (optional)**
+```bash
+pip install -e ".[dev]"
+```
+
 4. **Run the simulation**
 ```bash
 python main.py
+```
+
+### Linting (requires development dependencies)
+
+```bash
+# Check all files in the project
+ruff check .
+
+# Optional: automatically fix some issues
+ruff check . --fix
 ```

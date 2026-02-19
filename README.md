@@ -79,3 +79,10 @@ ruff check . --fix
 # Run mypy to perform type checking on Python files
 mypy .
 ```
+
+### Testing (requires development dependencies)
+
+```bash
+# Run all tests
+pytest
+```

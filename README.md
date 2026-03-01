@@ -57,17 +57,53 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-3a. **Install development dependencies (optional)**
-```bash
-pip install -e ".[dev]"
-```
-
 4. **Run the simulation**
 ```bash
 python main.py
 ```
 
-### Linting (requires development dependencies)
+------------------------------------------------------------------------
+
+## Development Environment (Tooling & Quality Gates) 
+
+### Installation 
+
+1. **Install backend development dependencies:** 
+
+From inside the activated backend virtual environment:
+
+```bash
+pip install -e ".[dev]"
+```
+
+This installs: 
+- Ruff (linting) 
+- Ruff formatter 
+- Mypy (type checking) 
+- Pytest (tests) 
+
+2. **Install pre-commit and associated git hook** 
+
+From the repository root:
+
+```bash
+pipx install pre-commit
+pre-commit install
+```
+
+3. **Run pre-commit manually to validate**
+
+```bash
+pre-commit run --all-files
+```
+
+Pre-commit automatically runs on every commit:
+- Ruff (lint)
+- Ruff-format (formatting)
+- Mypy (type checking)
+- Pytest (backend tests)
+
+### Manual Quality Commands (Optional)
 
 ```bash
 # Check all files in the project
@@ -76,13 +112,14 @@ ruff check .
 # Optional: automatically fix some issues
 ruff check . --fix
 
+# Run Ruff's formatter explicitly
+ruff format .
+
 # Run mypy to perform type checking on Python files
 mypy .
-```
 
-### Testing (requires development dependencies)
-
-```bash
 # Run all tests
 pytest
 ```
+
+------------------------------------------------------------------------

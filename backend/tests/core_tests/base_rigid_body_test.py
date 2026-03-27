@@ -20,13 +20,7 @@ from core.math.math_types import (
         ("no_param", 1.0, False),  # implicit default
         (None, 1.0, False),  # explicit default
         (2.0, 2.0, False),  # normal range mass value
-        (sys.float_info.max, sys.float_info.max, False),  # valid extremely big mass value
-        (sys.float_info.min, sys.float_info.min, False),  # valid extremely small mass value
-        (0.0, None, True),  # invalid null mass
-        (-1.0, None, True),  # invalid negative mass
-        (1, None, True),  # invalid type mass
-        (float("nan"), None, True),  # invalid nan mass
-        (np.inf, None, True),  # invalid infinity mass
+        (0.0, None, True),  # delegation to setter validation
     ],
 )
 def test_mass_initialization(value, expected, error):
@@ -47,19 +41,7 @@ def test_mass_initialization(value, expected, error):
         ("no_param", np.diag([0.1, 0.1, 0.1]), False),  # implicit default
         (None, np.diag([0.1, 0.1, 0.1]), False),  # explicit default
         (np.diag([0.2, 0.2, 0.2]), np.diag([0.2, 0.2, 0.2]), False),  # regular valid tensor
-        (np.zeros((3, 3)), np.zeros((3, 3)), False),  # technically valid zero mass tensor
-        ([[1, 0, 0], [0, 1, 0], [0, 0, 1]], None, True),  # not a np array
-        (np.array([1, 1, 1]), None, True),  # invalid tensor shape lower dimension
-        (
-            np.array([[[1, 0, 0], [0, 1, 0], [0, 0, 1]]]),
-            None,
-            True,
-        ),  # invalid tensor shape higher rank
-        (np.diag(np.array([1, 1, 1], dtype=int)), None, True),  # invalid dtype tensor
-        (np.diag([float("nan"), 1, 1]), None, True),  # invalid nan containing tensor
-        (np.diag([np.inf, 1, 1]), None, True),  # invalid infinity containing tensor
-        (np.array([[1, 0, 0], [1, 1, 0], [0, 0, 1]]), None, True),  # invalid asymmetric tensor
-        (np.diag([1, -1, 1]), None, True),  # invalid negative eigenvalue tensor
+        ([[1, 0, 0], [0, 1, 0], [0, 0, 1]], None, True),  # delegation to setter validation test
     ],
 )
 def test_inertia_tensor_initialization(value, expected, error):
@@ -81,22 +63,7 @@ def test_inertia_tensor_initialization(value, expected, error):
         ("no_param", np.array([0.0, 0.0, 0.0]), False),  # implicit default
         (None, np.array([0.0, 0.0, 0.0]), False),  # explicit default
         (np.array([1.0, 1.0, 1.0]), np.array([1.0, 1.0, 1.0]), False),  # simple position
-        (
-            np.array([sys.float_info.max, sys.float_info.max, sys.float_info.max]),
-            np.array([sys.float_info.max, sys.float_info.max, sys.float_info.max]),
-            False,
-        ),  # valid extremely large vector
-        (
-            np.array([sys.float_info.min, sys.float_info.min, sys.float_info.min]),
-            np.array([sys.float_info.min, sys.float_info.min, sys.float_info.min]),
-            False,
-        ),  # valid extremely small vector
-        ([1.0, 1.0, 1.0], None, True),  # not a np array
-        (np.array([0.0, 0.0]), None, True),  # invalid vector shape too short
-        (np.array([[1.0, 1.0, 1.0]]), None, True),  # invalid vector shape wrong rank
-        (np.array([1, 1, 1], dtype=int), None, True),  # invalid dtype vector
-        (np.array([float("nan"), 0, 0]), None, True),  # invalid nan containing vector
-        (np.array([np.inf, 0, 0]), None, True),  # invalid infinity containing vector
+        ([1.0, 1.0, 1.0], None, True),  # delegation to setter validation test
     ],
 )
 def test_assignable_vector3_attributes_initialization(attr, value, expected, error):
@@ -131,27 +98,7 @@ def test_default_only_vector3_attributes_initialization(attr):
             quaternion.quaternion(0.7071067811865476, 0.7071067811865476, 0, 0),
             False,
         ),  # usual quaternion
-        (
-            quaternion.quaternion(-1, 0, 0, 0),
-            quaternion.quaternion(-1, 0, 0, 0),
-            False,
-        ),  # equivalent negative quaternion
-        (
-            quaternion.quaternion(1 + 0.25e-12, 0, 0, 0),
-            quaternion.quaternion(1 + 0.25e-12, 0, 0, 0),
-            False,
-        ),  # normalization tolerance over boundary
-        (
-            quaternion.quaternion(1 - 0.25e-12, 0, 0, 0),
-            quaternion.quaternion(1 - 0.25e-12, 0, 0, 0),
-            False,
-        ),  # normalization tolerance under boundary
-        ((1, 0, 0, 0), None, True),  # invalid not a quaternion instance quaternion
-        (quaternion.quaternion(0, 0, 0, 0), None, True),  # invalid degenerate quaternion
-        (quaternion.quaternion(1 + 1e-12, 0, 0, 0), None, True),  # over-normalized quaternion
-        (quaternion.quaternion(1 - 1e-12, 0, 0, 0), None, True),  # under-normalized quaternion
-        (quaternion.quaternion(float("nan"), 0, 0, 0), None, True),  # invalid quaternion with nan
-        (quaternion.quaternion(np.inf, 0, 0, 0), None, True),  # invalid quaternion with infinity
+        ((1, 0, 0, 0), None, True),  # delegation to setter validation test
     ],
 )
 def test_orientation_initialization(value, expected, error):
@@ -308,103 +255,73 @@ def test_orientation_setter(value, expected, error):
         assert_quaternions_equal(rb.orientation, expected)
 
 
-# ------------
+# ------------------------------
 # Linear force accumulator tests
-# ------------
-
-
-def test_accumulated_force_default_initialization():
-    rb = BaseRigidBody()
-
-    assert isinstance(rb._accumulated_force, np.ndarray), (
-        "Accumulated force should be a numpy array after initialization"
-    )
-    assert rb._accumulated_force.shape == (3,), (
-        "Accumulated force should be of length 3 after initialization"
-    )
-    np.testing.assert_array_equal(
-        rb._accumulated_force, np.zeros(3), "Accumulated force should be initialized at [0,0,0]"
-    )
+# ------------------------------
 
 
 def test_accumulated_force_clear():
     rb = BaseRigidBody()
-    rb._accumulated_force = np.array([1.0, 1.0, 1.0])
+    rb.accumulated_force = np.ones(3)
     rb.clear_applied_force()
 
-    assert isinstance(rb._accumulated_force, np.ndarray), (
-        "Accumulated force should be a numpy array after clear"
-    )
-    assert rb._accumulated_force.shape == (3,), (
-        "Accumulated force should be of length 3 after clear"
-    )
-    np.testing.assert_array_equal(
-        rb._accumulated_force, np.zeros(3), "Accumulated force should be cleared to [0,0,0]"
-    )
+    np.testing.assert_array_equal(rb.accumulated_force, np.zeros(3))
 
 
-def test_apply_force_world_frame():
+def test_apply_force_world_frame_from_zero():
     rb = BaseRigidBody()
-
-    # Tests accumulation from initialized state
     rb.apply_force_world_frame(np.ones(3))
 
-    assert isinstance(rb._accumulated_force, np.ndarray), (
-        "Accumulated force should be a numpy array after accumulation"
-    )
-    assert rb._accumulated_force.shape == (3,), (
-        "Accumulated force should be of length 3 after accumulation"
-    )
-    np.testing.assert_array_equal(
-        rb._accumulated_force, np.ones(3), "Accumulated force should accumulate to [1,1,1]"
-    )
-
-    # Tests accumulation from a none zero accumulation
-    rb.apply_force_world_frame(np.array([2.0, 2.0, 2.0]))
-
-    assert isinstance(rb._accumulated_force, np.ndarray), (
-        "Accumulated force should be a numpy array after accumulation"
-    )
-    assert rb._accumulated_force.shape == (3,), (
-        "Accumulated force should be of length 3 after accumulation"
-    )
-    np.testing.assert_array_equal(
-        rb._accumulated_force,
-        np.array([3.0, 3.0, 3.0]),
-        "Accumulated force should accumulate to [3,3,3]",
-    )
+    np.testing.assert_array_equal(rb.accumulated_force, np.ones(3))
 
 
-def test_apply_force_body_frame():
+def test_apply_force_world_frame_accumulates():
     rb = BaseRigidBody()
+    rb.accumulated_force = np.ones(3)
+    rb.apply_force_world_frame(np.ones(3))
 
-    # Tests accumulation from initialized state
+    np.testing.assert_array_equal(rb.accumulated_force, np.array([2.0, 2.0, 2.0]))
+
+
+def test_apply_force_world_frame_validation_delegation():
+    rb = BaseRigidBody()
+    with pytest.raises(AssertionError):
+        rb.apply_force_world_frame([1.0, 1.0, 1.0])  # type: ignore[arg-type]
+
+
+def test_apply_force_body_frame_identify_orientation():
+    rb = BaseRigidBody()
     rb.apply_force_body_frame(np.ones(3))
 
-    assert isinstance(rb._accumulated_force, np.ndarray), (
-        "Accumulated force should be a numpy array after accumulation"
-    )
-    assert rb._accumulated_force.shape == (3,), (
-        "Accumulated force should be of length 3 after accumulation"
-    )
-    np.testing.assert_array_equal(
-        rb._accumulated_force, np.ones(3), "Accumulated force should accumulate to [1,1,1]"
-    )
+    np.testing.assert_array_equal(rb.accumulated_force, np.ones(3))
 
-    # Tests accumulation after an orientation change
-    # Note: Rotating the rigid body 90 degrees around the z axis
-    angle_rad = np.deg2rad(90)
-    rb._orientation = quaternion.quaternion(np.cos(angle_rad / 2), 0, 0, np.sin(angle_rad / 2))
+
+def test_apply_force_body_frame_rotated_orientation():
+    rb = BaseRigidBody()
+
+    angle = np.pi / 2
+    q = quaternion.quaternion(np.cos(angle / 2), 0, 0, np.sin(angle / 2))
+    rb.orientation = q
+
     rb.apply_force_body_frame(np.array([1.0, 0.0, 0.0]))
 
-    assert isinstance(rb._accumulated_force, np.ndarray), (
-        "Accumulated force should be a numpy array after accumulation"
-    )
-    assert rb._accumulated_force.shape == (3,), (
-        "Accumulated force should be of length 3 after accumulation"
-    )
-    np.testing.assert_array_equal(
-        rb._accumulated_force,
-        np.array([1.0, 2.0, 1.0]),
-        "Accumulated force should accumulate to [1,2,1]",
-    )
+    np.testing.assert_allclose(rb.accumulated_force, np.array([0.0, 1.0, 0.0]))  # type: ignore[arg-type]
+
+def test_apply_force_body_frame_accumulated():
+    rb = BaseRigidBody()
+
+    rb.accumulated_force = np.ones(3)
+
+    angle = np.pi / 2
+    q = quaternion.quaternion(np.cos(angle / 2), 0, 0, np.sin(angle / 2))
+    rb.orientation = q
+
+    rb.apply_force_body_frame(np.array([1.0, 0.0, 0.0]))
+
+    np.testing.assert_allclose(rb.accumulated_force, np.array([1.0, 2.0, 1.0]))  # type: ignore[arg-type]
+
+
+def test_apply_force_body_frame_validation_delegation():
+    rb = BaseRigidBody()
+    with pytest.raises(AssertionError):
+        rb.apply_force_body_frame([1.0, 1.0, 1.0])  # type: ignore[arg-type]

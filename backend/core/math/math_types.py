@@ -52,9 +52,9 @@ def assert_inertia_tensor(it: np.ndarray):
     )
 
 
-def assert_mass(m):
-    assert_scalar(m)
-    assert m > 0, f"Mass must be positive, got {m}"
+def assert_strictly_positive_finite_scalar(s):
+    assert_scalar(s)
+    assert s > 0, f"Expected a positive value, got {s}"
 
 
 # Comparison utils

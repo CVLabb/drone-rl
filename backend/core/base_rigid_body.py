@@ -7,8 +7,8 @@ from .math.math_types import (
     Scalar,
     Vector3,
     assert_inertia_tensor,
-    assert_mass,
     assert_quaternion,
+    assert_strictly_positive_finite_scalar,
     assert_vector3,
 )
 
@@ -96,7 +96,7 @@ class BaseRigidBody:
 
     @mass.setter
     def mass(self, mass: Scalar) -> None:
-        assert_mass(mass)
+        assert_strictly_positive_finite_scalar(mass)
         self._mass = mass
 
     @property

@@ -307,6 +307,7 @@ def test_apply_force_body_frame_rotated_orientation():
 
     np.testing.assert_allclose(rb.accumulated_force, np.array([0.0, 1.0, 0.0]))  # type: ignore[arg-type]
 
+
 def test_apply_force_body_frame_accumulated():
     rb = BaseRigidBody()
 
